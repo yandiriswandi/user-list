@@ -167,7 +167,21 @@ class HeaderContainer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context); // Kembali ke halaman sebelumnya
             },
-            child: Icon(Icons.arrow_back),
+            child: Card(
+              color: Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(100), // Rounded full
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(
+                  8.0,
+                ), // Padding agar ikonnya tidak mepet
+                child: Icon(
+                  Icons.arrow_back,
+                  color: Colors.white, // Warna ikon putih
+                ),
+              ),
+            ),
           ),
         ),
       ),

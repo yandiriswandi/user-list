@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:user_list/models/userModel.dart';
 import 'package:user_list/page/userDetail.dart';
@@ -49,25 +50,37 @@ class _UserPageState extends State<UserPage> {
   }
 
   Widget _buildUserTile(UserModel user) {
-    return ListTile(
-      leading: CircleAvatar(backgroundImage: NetworkImage(user.avatar)),
-      title: Text("${user.firstName} ${user.lastName}"),
-      subtitle: Text(user.email),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => UserdetailPage(userId: user.id),
+    return Column(
+      children: [
+        ListTile(
+          leading: CircleAvatar(backgroundImage: NetworkImage(user.avatar)),
+          title: Text(
+            "${user.firstName} ${user.lastName}",
+            style: GoogleFonts.poppins(),
           ),
-        );
-      },
+          subtitle: Text(user.email, style: GoogleFonts.poppins()),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => UserdetailPage(userId: user.id),
+              ),
+            );
+          },
+        ),
+
+        Padding(
+          padding: const EdgeInsets.only(right: 15, left: 15),
+          child: Divider(thickness: 1, height: 0),
+        ),
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('User List')),
+      appBar: AppBar(title: Text('User List', style: GoogleFonts.poppins())),
       body: ListView.builder(
         controller: _scrollController,
         itemCount: users.length + (isLoading ? 10 : 0),

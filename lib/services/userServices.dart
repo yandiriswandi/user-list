@@ -22,7 +22,10 @@ class Userservices {
   }
 
   Future<UserModel> fetchUser(int id) async {
-    final response = await dio.get("https://reqres.in/api/users/$id");
+    final response = await dio.get(
+      "https://reqres.in/api/users/$id",
+      options: Options(headers: {'x-api-key': 'reqres-free-v1'}),
+    );
 
     if (response.statusCode == 200) {
       return UserModel.fromJson(response.data["data"]);
