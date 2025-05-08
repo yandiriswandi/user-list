@@ -1,55 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:user_list/controllers/user_controller.dart';
 import 'package:user_list/models/userModel.dart';
-import 'package:user_list/page/userDetail.dart';
-import 'package:user_list/services/userServices.dart';
+import 'package:user_list/page/user_detail.dart';
 
-class UserPage extends StatefulWidget {
-  @override
-  _UserPageState createState() => _UserPageState();
-}
-
-class _UserPageState extends State<UserPage> {
-  final Userservices apiService = Userservices();
-  final ScrollController _scrollController = ScrollController();
-
-  List<UserModel> users = [];
-  int currentPage = 1;
-  int totalPage = 1;
-  bool isLoading = false;
-  bool isLastPage = false;
+class UserPage extends StatelessWidget {
+  var usersC = Get.put(UsersController());
 
   @override
-  void initState() {
-    super.initState();
-    fetchData();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('User List', style: GoogleFonts.poppins())),
+      body: GetBuilder(
+        init: usersC,
+        builder:
+            (context) => ListView.builder(
+              itemCount: usersC.users.length + (usersC.isLoading ? 10 : 0),
+              itemBuilder: (context, index) {
+                if (usersC.isLoading) {
+                  return _buildSkeleton();
+                } else {
+                  return _buildUserTile(context, usersC.users[index]);
+                }
+              },
+            ),
+      ),
+    );
   }
 
-  Future<void> fetchData() async {
-    if (isLoading || isLastPage) return;
-
-    setState(() => isLoading = true);
-
-    try {
-      final response = await apiService.fetchUsers();
-      setState(() {
-        users.addAll(response);
-      });
-    } catch (e) {
-      print("Error fetching users: $e");
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  Widget _buildUserTile(UserModel user) {
+  Widget _buildUserTile(BuildContext context, UserModel user) {
     return Column(
       children: [
         ListTile(
@@ -60,11 +41,10 @@ class _UserPageState extends State<UserPage> {
           ),
           subtitle: Text(user.email, style: GoogleFonts.poppins()),
           onTap: () {
+            usersC.fetchUserById(user.id);
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => UserdetailPage(userId: user.id),
-              ),
+              MaterialPageRoute(builder: (context) => UserDetailPage()),
             );
           },
         ),
@@ -77,55 +57,37 @@ class _UserPageState extends State<UserPage> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('User List', style: GoogleFonts.poppins())),
-      body: ListView.builder(
-        controller: _scrollController,
-        itemCount: users.length + (isLoading ? 10 : 0),
-        itemBuilder: (context, index) {
-          if (isLoading) {
-            return _buildSkeleton();
-          } else {
-            return _buildUserTile(users[index]);
-          }
-        },
+  Widget _buildSkeleton() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Row(
+          children: [
+            Container(
+              width: 40.0,
+              height: 40.0,
+              decoration: BoxDecoration(
+                color: Colors.grey[700]!,
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+            ),
+            SizedBox(width: 10),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(height: 20.0, color: Colors.grey[100]!),
+                  SizedBox(height: 8),
+                  Container(width: 100, height: 20.0, color: Colors.grey[100]!),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
-}
-
-Widget _buildSkeleton() {
-  return Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
-      child: Row(
-        children: [
-          Container(
-            width: 40.0,
-            height: 40.0,
-            decoration: BoxDecoration(
-              color: Colors.grey[700]!,
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-          ),
-          SizedBox(width: 10),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(height: 20.0, color: Colors.grey[100]!),
-                SizedBox(height: 8),
-                Container(width: 100, height: 20.0, color: Colors.grey[100]!),
-              ],
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
 }

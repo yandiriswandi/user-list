@@ -1,6 +1,3 @@
-// services/userServices.dart
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import '../models/userModel.dart';
 
@@ -8,7 +5,10 @@ Dio dio = Dio();
 
 class Userservices {
   Future<List<UserModel>> fetchUsers() async {
-    final response = await dio.get("https://reqres.in/api/users");
+    final response = await dio.get(
+      "https://reqres.in/api/users",
+      options: Options(headers: {'x-api-key': 'reqres-free-v1'}),
+    );
 
     if (response.statusCode == 200) {
       final data = response.data["data"];
